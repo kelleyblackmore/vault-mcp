@@ -11,6 +11,7 @@ COPY tsconfig.json ./
 COPY src ./src
 
 # Install all dependencies (including dev dependencies needed for build)
+# Note: strict-ssl is disabled for build environments with self-signed certificates
 RUN npm config set strict-ssl false && npm install
 
 # Production stage
@@ -22,6 +23,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only (skip scripts to avoid running prepare/build)
+# Note: strict-ssl is disabled for build environments with self-signed certificates
 RUN npm config set strict-ssl false && npm ci --omit=dev --ignore-scripts
 
 # Copy built files from builder

@@ -131,7 +131,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "vault_write": {
         const { path, data } = args as { path: string; data: Record<string, any> };
-        const result = await vaultClient.write(path, data);
+        // For KV v2, wrap data in a data object
+        const result = await vaultClient.write(path, { data });
         return {
           content: [
             {

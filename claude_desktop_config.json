@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "vault": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--network",
+        "host",
+        "-e",
+        "VAULT_ADDR=http://localhost:8200",
+        "-e",
+        "VAULT_TOKEN=myroot",
+        "vault-mcp"
+      ]
+    }
+  }
+}

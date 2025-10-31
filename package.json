@@ -1,0 +1,32 @@
+{
+  "name": "vault-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for HashiCorp Vault",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "vault-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "vault",
+    "hashicorp",
+    "secrets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "node-vault": "^0.10.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}

@@ -13,6 +13,12 @@ import vault from "node-vault";
 const VAULT_ADDR = process.env.VAULT_ADDR || "http://127.0.0.1:8200";
 const VAULT_TOKEN = process.env.VAULT_TOKEN;
 
+// Validate required environment variables
+if (!VAULT_TOKEN) {
+  console.error("Error: VAULT_TOKEN environment variable is required");
+  process.exit(1);
+}
+
 // Initialize Vault client
 const vaultClient = vault({
   apiVersion: "v1",
@@ -125,7 +131,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "vault_write": {
         const { path, data } = args as { path: string; data: Record<string, any> };
-        const result = await vaultClient.write(path, { data });
+        const result = await vaultClient.write(path, data);
         return {
           content: [
             {

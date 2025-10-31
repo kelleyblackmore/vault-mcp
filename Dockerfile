@@ -24,7 +24,7 @@ COPY package*.json ./
 
 # Install production dependencies only (skip scripts to avoid running prepare/build)
 # Note: strict-ssl is disabled for build environments with self-signed certificates
-RUN npm config set strict-ssl false && npm ci --omit=dev --ignore-scripts
+RUN npm config set strict-ssl false && npm install --omit=dev --ignore-scripts
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist

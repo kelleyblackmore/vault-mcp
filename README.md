@@ -33,6 +33,24 @@ This will start:
 
 ## Building the Docker Image
 
+### Using Pre-built Images from GitHub Container Registry
+
+Pre-built container images are automatically published to GitHub Container Registry:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/kelleyblackmore/vault-mcp:latest
+
+# Pull a specific version
+docker pull ghcr.io/kelleyblackmore/vault-mcp:v1.0.0
+```
+
+The images are automatically built for multiple platforms:
+- `linux/amd64` (x86_64)
+- `linux/arm64` (ARM64/aarch64)
+
+### Building Locally
+
 ```bash
 docker build -t vault-mcp .
 ```
@@ -93,12 +111,20 @@ Add to your Claude Desktop configuration file:
         "VAULT_ADDR=http://your-vault:8200",
         "-e",
         "VAULT_TOKEN=your-vault-token",
-        "vault-mcp"
+        "ghcr.io/kelleyblackmore/vault-mcp:latest"
       ]
     }
   }
 }
 ```
+
+> **Note**: 
+> - Replace `your-vault:8200` with your Vault server address
+> - Replace `your-vault-token` with your Vault authentication token
+> 
+> **Migrating from local builds**: If you previously built the image locally as `vault-mcp`, you can:
+> - Use pre-built images by updating the image name to `ghcr.io/kelleyblackmore/vault-mcp:latest`, or
+> - Continue using your local image by keeping the image name as `vault-mcp`
 
 ## Available Tools
 
@@ -182,6 +208,9 @@ VAULT_ADDR=http://localhost:8200 VAULT_TOKEN=myroot npm start
 
 ```
 vault-mcp/
+├── .github/
+│   └── workflows/
+│       └── docker-build-publish.yml  # CI/CD workflow for container builds
 ├── src/
 │   └── index.ts          # Main MCP server implementation
 ├── dist/                 # Compiled JavaScript (generated)
@@ -191,6 +220,16 @@ vault-mcp/
 ├── tsconfig.json        # TypeScript configuration
 └── README.md           # This file
 ```
+
+### CI/CD
+
+The project uses GitHub Actions to automatically build and publish Docker images:
+
+- **On push to main**: Builds and publishes the `latest` tag and a SHA-based tag
+- **On pull request**: Builds the image to verify it compiles (does not publish)
+- **On version tags** (e.g., `v1.0.0`): Builds and publishes version-specific tags (e.g., `v1.0.0`, `v1.0`, `v1`)
+
+Images are published to GitHub Container Registry at `ghcr.io/kelleyblackmore/vault-mcp`.
 
 ## Security Considerations
 

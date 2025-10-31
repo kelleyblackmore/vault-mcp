@@ -118,7 +118,10 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-> **Note**: Replace `your-vault:8200` with your Vault server address and `your-vault-token` with your Vault token. You can also use a locally built image by replacing `ghcr.io/kelleyblackmore/vault-mcp:latest` with `vault-mcp`.
+> **Note**: 
+> - Replace `your-vault:8200` with your Vault server address
+> - Replace `your-vault-token` with your Vault authentication token
+> - You can use a locally built image by replacing `ghcr.io/kelleyblackmore/vault-mcp:latest` with `vault-mcp`
 
 ## Available Tools
 

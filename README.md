@@ -2,6 +2,10 @@
 
 A containerized Model Context Protocol (MCP) server for interacting with HashiCorp Vault. This server provides MCP tools for reading, writing, listing, and deleting secrets in Vault.
 
+<a href="https://glama.ai/mcp/servers/@kelleyblackmore/vault-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@kelleyblackmore/vault-mcp/badge" alt="Vault Server MCP server" />
+</a>
+
 ## Features
 
 - **vault_read**: Read secrets from Vault at a specified path

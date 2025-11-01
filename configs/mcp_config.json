@@ -6,13 +6,11 @@
         "run",
         "-i",
         "--rm",
-        "--network",
-        "host",
         "-e",
-        "VAULT_ADDR=http://localhost:8200",
+        "VAULT_ADDR=http://host.docker.internal:8200",
         "-e",
         "VAULT_TOKEN=myroot",
-        "vault-mcp"
+        "vault-mcp-vault-mcp:latest"
       ]
     }
   }

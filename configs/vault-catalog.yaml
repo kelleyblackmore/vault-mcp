@@ -1,0 +1,24 @@
+apiVersion: v1alpha1
+kind: Catalog
+metadata:
+  name: vault-mcp
+servers:
+  - name: vault-mcp
+    image: vault-mcp-vault-mcp:latest
+    type: server
+    about:
+      title: Vault MCP
+      description: Vault secrets management - read, write, list, and delete secrets from HashiCorp Vault
+    config:
+      env:
+        - name: VAULT_ADDR
+          value: "http://host.docker.internal:8200"
+        - name: VAULT_TOKEN
+          value: "myroot"
+    metadata:
+      category: devops
+      tags:
+        - vault
+        - secrets
+        - hashicorp
+        - security

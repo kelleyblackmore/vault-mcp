@@ -12,12 +12,44 @@ A containerized Model Context Protocol (MCP) server for interacting with HashiCo
 ## Prerequisites
 
 - Docker and Docker Compose
+- Docker Desktop 4.42.0+ with MCP Toolkit enabled (for Docker Desktop integration)
 - HashiCorp Vault instance (can use the included dev server)
 - Vault token for authentication
 
-## Quick Start with Docker Compose
+## Quick Start
 
-The easiest way to get started is using the included `docker-compose.yml` which sets up both Vault (in dev mode) and the MCP server:
+### Option 1: Docker Desktop MCP Toolkit (Recommended)
+
+Run the setup script to install and configure the server:
+
+**Windows (PowerShell):**
+```powershell
+.\setup.ps1
+```
+
+**macOS/Linux (Bash):**
+```bash
+./setup.sh
+```
+
+**What the setup script does:**
+- Builds the Docker image if needed
+- Starts Vault dev server
+- Creates the MCP catalog in Docker Desktop
+- Adds and enables the vault-mcp server
+
+**Configuration used:**
+- Catalog file: `configs/vault-catalog.yaml`
+- Vault address: `http://host.docker.internal:8200`
+- Vault token: `myroot` (dev mode)
+
+After running the setup script, restart Docker Desktop to see the server in the "My Servers" section.
+
+See `docs/INSTALL_DOCKER_DESKTOP.md` for detailed installation instructions.
+
+### Option 2: Docker Compose
+
+Start both Vault and the MCP server:
 
 ```bash
 # Build and start services
@@ -30,6 +62,76 @@ docker-compose logs -f vault-mcp
 This will start:
 - A Vault dev server at `http://localhost:8200` with root token `myroot`
 - The vault-mcp server connected to the Vault instance
+
+## MCP Client Setup
+
+### Cursor IDE
+
+**Step 1: Copy the configuration**
+
+Copy `configs/mcp_config.json` to your Cursor MCP configuration file:
+
+**Windows:**
+```powershell
+# Create directory if it doesn't exist
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cursor"
+
+# Copy the config file
+Copy-Item -Path "configs\mcp_config.json" -Destination "$env:USERPROFILE\.cursor\mcp.json"
+```
+
+**macOS/Linux:**
+```bash
+# Create directory if it doesn't exist
+mkdir -p ~/.cursor
+
+# Copy the config file
+cp configs/mcp_config.json ~/.cursor/mcp.json
+```
+
+**Step 2: Update the configuration** (if needed)
+
+Edit `~/.cursor/mcp.json` (or `%USERPROFILE%\.cursor\mcp.json` on Windows) and update:
+- `VAULT_ADDR`: Your Vault server address
+- `VAULT_TOKEN`: Your Vault token
+- Image name: Use `vault-mcp-vault-mcp:latest` if built locally
+
+**Step 3: Restart Cursor**
+
+Completely quit and restart Cursor for the changes to take effect.
+
+**Step 4: Test**
+
+In Cursor, try asking:
+```
+Use vault_read to read the secret at path secret/data/test
+```
+
+See `docs/TEST_CURSOR_MCP.md` for more testing instructions.
+
+### Claude Desktop
+
+Copy the configuration from `configs/mcp_config.json` to your Claude Desktop configuration:
+
+**Windows:**
+```powershell
+# Location: %APPDATA%\Claude\claude_desktop_config.json
+Copy-Item -Path "configs\mcp_config.json" -Destination "$env:APPDATA\Claude\claude_desktop_config.json"
+```
+
+**macOS:**
+```bash
+# Location: ~/Library/Application Support/Claude/claude_desktop_config.json
+cp configs/mcp_config.json ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+**Linux:**
+```bash
+# Location: ~/.config/claude-desktop/claude_desktop_config.json
+cp configs/mcp_config.json ~/.config/claude-desktop/claude_desktop_config.json
+```
+
+Then restart Claude Desktop.
 
 ## Building the Docker Image
 
@@ -52,7 +154,9 @@ The images are automatically built for multiple platforms:
 ### Building Locally
 
 ```bash
-docker build -t vault-mcp .
+docker-compose build vault-mcp
+# Or
+docker build -t vault-mcp-vault-mcp:latest .
 ```
 
 ## Running the Container
@@ -60,10 +164,10 @@ docker build -t vault-mcp .
 ### With Docker Run
 
 ```bash
-docker run -it \
-  -e VAULT_ADDR=http://your-vault:8200 \
-  -e VAULT_TOKEN=your-vault-token \
-  vault-mcp
+docker run -it --rm \
+  -e VAULT_ADDR=http://host.docker.internal:8200 \
+  -e VAULT_TOKEN=myroot \
+  vault-mcp-vault-mcp:latest
 ```
 
 ### With Docker Compose
@@ -89,42 +193,9 @@ The server is configured via environment variables:
 - `VAULT_ADDR`: The Vault server address (default: `http://127.0.0.1:8200`)
 - `VAULT_TOKEN`: The Vault authentication token (required)
 
-## Using with MCP Clients
-
-### Claude Desktop Configuration
-
-Add to your Claude Desktop configuration file:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "vault": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "VAULT_ADDR=http://your-vault:8200",
-        "-e",
-        "VAULT_TOKEN=your-vault-token",
-        "ghcr.io/kelleyblackmore/vault-mcp:latest"
-      ]
-    }
-  }
-}
-```
-
-> **Note**: 
-> - Replace `your-vault:8200` with your Vault server address
-> - Replace `your-vault-token` with your Vault authentication token
-> 
-> **Migrating from local builds**: If you previously built the image locally as `vault-mcp`, you can:
-> - Use pre-built images by updating the image name to `ghcr.io/kelleyblackmore/vault-mcp:latest`, or
-> - Continue using your local image by keeping the image name as `vault-mcp`
+Configuration files are located in the `configs/` directory:
+- `configs/vault-catalog.yaml` - Docker Desktop MCP Toolkit catalog configuration
+- `configs/mcp_config.json` - MCP client configuration (Cursor, Claude Desktop)
 
 ## Available Tools
 
@@ -211,12 +282,18 @@ vault-mcp/
 ├── .github/
 │   └── workflows/
 │       └── docker-build-publish.yml  # CI/CD workflow for container builds
+├── configs/              # MCP configuration files
+│   ├── mcp_config.json   # MCP client configuration (Cursor, Claude Desktop)
+│   └── vault-catalog.yaml # Docker Desktop MCP Toolkit catalog
+├── docs/                 # Documentation files
 ├── src/
 │   └── index.ts          # Main MCP server implementation
 ├── dist/                 # Compiled JavaScript (generated)
 ├── Dockerfile           # Container definition
 ├── docker-compose.yml   # Docker Compose configuration
 ├── package.json         # Node.js dependencies
+├── setup.ps1            # Setup script for Windows (PowerShell)
+├── setup.sh             # Setup script for macOS/Linux (Bash)
 ├── tsconfig.json        # TypeScript configuration
 └── README.md           # This file
 ```
